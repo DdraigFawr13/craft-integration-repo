@@ -4,8 +4,11 @@
   "private": true,
   "description": "Registers the craft apps' own MCP servers with Claude Code and checks that they answer.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "test": "node --test test/craft.test.mjs"
-  }
+  },
+  "license": "MIT OR Apache-2.0"
 }

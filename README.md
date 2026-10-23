@@ -66,3 +66,7 @@ npm test    # or: node --test test/craft.test.mjs
 ```
 
 The tests use a stand-in server (`test/fixtures/fake-server.mjs`); no app needs to be installed.
+
+## Licence
+
+MIT or Apache-2.0, at your option (`LICENSE-MIT`, `LICENSE-APACHE`), the same as the craft apps.
