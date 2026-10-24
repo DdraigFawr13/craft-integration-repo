@@ -1,6 +1,6 @@
 ---
 name: craft-apps
-description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video or motion graphics, through the mcp__<app>__ or mcp__<app>-live__ tools.
+description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video, motion graphics or interface designs, through the mcp__<app>__ or mcp__<app>-live__ tools.
 ---
 
 # Working in the craft apps
@@ -47,4 +47,5 @@ The read-only tools in `readOnlyTools` already run without asking. Every other t
   apps word it their own way): the app is confined to `{workFolder}`. Copy the file there.
 - **The app is not reachable** on an `-live` tool: its window is closed. Ask the user to run
   `node craft.mjs open <app>`, or use the headless `<app>` tools instead.
-- **A tool the guide names is missing:** the installed version differs. Run `node craft.mjs update --check`.
+- **A tool the guide names is missing:** the installed version differs from the guide's. Run
+  `node {repo}/craft.mjs doctor` for the installed versions; the ArtCraft Launcher shows and installs updates.
