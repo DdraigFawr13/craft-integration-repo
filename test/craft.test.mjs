@@ -28,6 +28,12 @@ test('a config with a bad app name is refused', () => {
   assert.throws(() => loadConfig(file), /may use only/);
 });
 
+test('a config saved with a UTF-8 byte order mark loads', () => {
+  const file = join(mkdtempSync(join(tmpdir(), 'craft-')), 'bom.json');
+  writeFileSync(file, `﻿${JSON.stringify(fakeConfig())}`);
+  assert.equal(loadConfig(file).apps[0].name, 'fake');
+});
+
 test('installer folders are searched before PATH on Windows', () => {
   const env = { ProgramFiles: 'C:\\Program Files', LOCALAPPDATA: 'C:\\Users\\m\\AppData\\Local', PATH: 'C:\\bin' };
   const paths = candidatePaths({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32');
@@ -83,6 +89,13 @@ test('check passes against a server that answers, following tool-list pages', as
   const lines = [];
   assert.equal(await check(fakeConfig(), { log: (l) => lines.push(l) }), 0);
   assert.match(lines[0], /^PASS {5}Fake: fake 1.0, 2 tools$/);
+});
+
+test('check says to run setup when an app needs a work folder that is missing', async () => {
+  const lines = [];
+  const config = { ...fakeConfig({ args: [fakeServer, '--root', '{workFolder}'] }), workFolder: join(tmpdir(), 'craft-no-such-folder') };
+  assert.equal(await check(config, { log: (l) => lines.push(l) }), 1);
+  assert.match(lines[0], /does not exist yet\. Run setup first\.$/);
 });
 
 test('check fails when the config names a tool the server lacks', async () => {
