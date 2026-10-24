@@ -10,8 +10,9 @@ DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft and EffectCraft. More ar
 
 ## Use it
 
-Needs Node 20 or newer, Claude Code (found on PATH or in `~/.local/bin`, where its installer puts it), and the apps installed from their release
-installers, which put `<app>-cli.exe` in `C:\Program Files\<App>\`.
+Needs Node 20 or newer, Claude Code (found on PATH or in `~/.local/bin`, where its installer puts it), and the
+apps. `node craft.mjs update` installs them for your account in `%LOCALAPPDATA%\Programs\<App>\` with no admin
+prompt. Apps installed from the release MSIs (`C:\Program Files\<App>\`) are found too; the per-user copy wins.
 
 ```sh
 node craft.mjs doctor            # which apps are installed, where, which version
@@ -38,21 +39,27 @@ Then restart Claude Code and run `/mcp` to see the servers.
 ## Keep the apps updated
 
 ```sh
-node craft.mjs update --check        # installed version vs latest release, with installer name and size
-node craft.mjs update                # install every newer release, then run check on the apps
+node craft.mjs update --check        # installed version vs latest release, with the zip's name and size
+node craft.mjs update                # install every newer release for your account, then run check on the apps
 node craft.mjs update wordcraft      # just one (or several) apps
 ```
 
 Releases come from `github.com/<releaseOwner>/<app>` (`storytold` in `craft-apps.json`; an app can set its own
-`repo`). For each app that is behind, `update`:
+`repo`). `update` uses each release's portable zip, not its MSI, so it never needs admin rights. For each app
+that is behind, or only installed for all users, it:
 
-1. Refuses if the app is running, since the installer would have to close it.
-2. Downloads `<app>-<version>-windows-x64.msi` to `%LOCALAPPDATA%\craft\downloads`.
-3. Checks its SHA-256 against the release's `SHA256SUMS.txt`, and deletes it if they differ.
-4. Runs `msiexec /i <file> /passive /norestart`. The installers are per-machine, so Windows asks you to
-   allow each one. Nothing is installed without that click.
-5. Checks the app now reports the new version, deletes the installer, and finally runs `check`, so a release
-   that renamed or re-annotated a tool on the allow list shows up as a FAIL.
+1. Downloads `<app>-<version>-windows-x64-portable.zip` to `%LOCALAPPDATA%\craft\downloads`.
+2. Checks its SHA-256 against the release's `SHA256SUMS.txt`, and deletes it if they differ.
+3. Unpacks it to `%LOCALAPPDATA%\craft\apps\<app>-<version>` and checks the new CLI reports that version.
+4. Points the junction `%LOCALAPPDATA%\Programs\<App>` at the new folder. The path Claude uses never changes, and
+   a running copy (a Claude session keeps `<app>-cli.exe` open) carries on until it restarts.
+5. Deletes the zip and older versions no longer in use, then runs `check`, so a release that renamed or
+   re-annotated a tool on the allow list shows up as a FAIL.
+
+The apps keep their settings in your profile, not beside the program (SoundCraft's README names
+`%APPDATA%\SoundCraft`), so they should carry over. After the first run, run `setup` so Claude uses the
+per-user copies, then uninstall the all-users copies in Settings > Apps. That asks for admin once; later
+updates never do.
 
 ## The app list
 

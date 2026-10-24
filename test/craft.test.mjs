@@ -37,16 +37,16 @@ test('a config saved with a UTF-8 byte order mark loads', () => {
   assert.equal(loadConfig(file).apps[0].name, 'fake');
 });
 
-test('installer folders are searched before PATH on Windows', () => {
+test('the per-user copy is searched first, then Program Files, then PATH on Windows', () => {
   const env = { ProgramFiles: 'C:\\Program Files', LOCALAPPDATA: 'C:\\Users\\m\\AppData\\Local', PATH: 'C:\\bin' };
   const paths = candidatePaths({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32');
   assert.deepEqual(paths, [
-    'C:\\Program Files\\WordCraft\\wordcraft-cli.exe',
     'C:\\Users\\m\\AppData\\Local\\Programs\\WordCraft\\wordcraft-cli.exe',
+    'C:\\Program Files\\WordCraft\\wordcraft-cli.exe',
     'C:\\bin\\wordcraft-cli.exe',
   ]);
-  const found = findExe({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32', (p) => p.startsWith('C:\\Users'));
-  assert.equal(found, 'C:\\Users\\m\\AppData\\Local\\Programs\\WordCraft\\wordcraft-cli.exe');
+  const found = findExe({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32', (p) => p.startsWith('C:\\Program'));
+  assert.equal(found, 'C:\\Program Files\\WordCraft\\wordcraft-cli.exe');
 });
 
 test('the work folder fills in {workFolder} and ~ expands to home', () => {
