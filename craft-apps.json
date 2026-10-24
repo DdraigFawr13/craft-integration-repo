@@ -8,7 +8,7 @@
       "exe": "photocraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "session_list", "arguments": {} },
-      "readOnlyTools": ["session_list", "doc_inspect", "doc_render_preview", "command_list", "jobs_list"]
+      "readOnlyTools": ["session_list", "doc_inspect", "doc_render_preview", "render_preview", "command_list", "ui_inspect", "ui_screenshot"]
     },
     {
       "name": "lightcraft",
@@ -17,16 +17,97 @@
       "exe": "lightcraft-cli",
       "args": ["mcp", "--compact"],
       "probe": { "tool": "list_controls", "arguments": {} },
-      "readOnlyTools": ["list_commands", "query_photos", "list_controls", "get_develop"]
+      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "list_commands", "query_photos", "list_controls", "get_develop"]
     },
     {
       "name": "wordcraft",
       "label": "WordCraft",
       "installDir": "WordCraft",
       "exe": "wordcraft-cli",
-      "args": ["mcp"],
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "get_text", "arguments": {} },
-      "readOnlyTools": ["list_commands", "get_text", "inspect_document", "render_page", "parity"]
+      "readOnlyTools": ["list_commands", "get_text", "inspect_document", "render_page", "parity", "screenshot", "ui_inspect"]
+    },
+    {
+      "name": "pdfcraft",
+      "label": "PdfCraft",
+      "installDir": "PdfCraft",
+      "exe": "pdfcraft-cli",
+      "args": ["mcp", "--compact", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "command_list", "arguments": {} },
+      "readOnlyTools": ["doc_info", "page_render", "text_extract", "text_find", "command_list", "doc_inspect", "render_preview", "tool_search"]
+    },
+    {
+      "name": "designcraft",
+      "label": "DesignCraft",
+      "installDir": "DesignCraft",
+      "exe": "designcraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_document", "get_story", "menu_list", "ui_inspect"]
+    },
+    {
+      "name": "gridcraft",
+      "label": "GridCraft",
+      "installDir": "GridCraft",
+      "exe": "gridcraft-cli",
+      "args": ["mcp"],
+      "probe": { "tool": "list_functions", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_workbook", "read_range", "get_cell", "evaluate_formula", "list_functions"]
+    },
+    {
+      "name": "deckcraft",
+      "label": "DeckCraft",
+      "installDir": "DeckCraft",
+      "exe": "deckcraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_document", "inspect_slide", "render_slide", "screenshot"]
+    },
+    {
+      "name": "cadcraft",
+      "label": "CADCraft",
+      "installDir": "CADCraft",
+      "exe": "cadcraft-cli",
+      "args": ["mcp"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_drawing", "query_entities", "find_text"]
+    },
+    {
+      "name": "vectorcraft",
+      "label": "VectorCraft",
+      "installDir": "VectorCraft",
+      "exe": "vectorcraft-cli",
+      "args": ["mcp", "--headless", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "command_list", "arguments": {} },
+      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "ui_inspect", "ui_screenshot", "list_commands", "inspect_document", "inspect_ui"]
+    },
+    {
+      "name": "soundcraft",
+      "label": "SoundCraft",
+      "installDir": "SoundCraft",
+      "exe": "soundcraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_session", "parity", "ui_inspect"]
+    },
+    {
+      "name": "filmcraft",
+      "label": "FilmCraft",
+      "installDir": "FilmCraft",
+      "exe": "filmcraft-cli",
+      "args": ["mcp"],
+      "probe": { "tool": "command_list", "arguments": {} },
+      "readOnlyTools": ["command_list", "doc_inspect", "project_inspect", "render_frame", "render_preview", "sequence_inspect", "ui_elements", "ui_inspect", "ui_screenshot"]
+    },
+    {
+      "name": "effectcraft",
+      "label": "EffectCraft",
+      "installDir": "EffectCraft",
+      "exe": "effectcraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "describe_command", "get_project", "get_comp", "get_layer", "get_property", "list_effects", "list_fonts", "get_state", "command_list", "render_preview", "doc_inspect"]
     }
   ]
 }
