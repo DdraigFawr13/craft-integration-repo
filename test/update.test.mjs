@@ -110,7 +110,7 @@ test('a verified download kept from a failed install is reused; a partial one is
   const lines = [];
   await update(config, { install: true, fetchFn: refetched.fetchFn, downloads, installMsi: () => 1619, log: (l) => lines.push(l) });
   assert.equal(refetched.calls.includes('https://dl/msi'), true);
-  assert.match(lines[1], /1619 \(Windows Installer could not open the package; .*run update from your own terminal\)/);
+  assert.match(lines[1], /1619 \(Windows Installer could not open the package; if it repeats, run update from your own terminal\)/);
 });
 
 test('naming an app that is not in the list is refused', async () => {
