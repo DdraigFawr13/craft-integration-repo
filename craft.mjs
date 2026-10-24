@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { loadConfig } from './lib/config.mjs';
 import { check, doctor, setup } from './lib/commands.mjs';
+import { update } from './lib/update.mjs';
 
 const USAGE = `Usage: node craft.mjs <command> [options]
 
@@ -11,6 +12,9 @@ const USAGE = `Usage: node craft.mjs <command> [options]
   setup [--dry-run]   Register each installed app with Claude Code (user scope)
         [--no-allow]  and allow its read-only tools. --dry-run only prints.
   check               Start each app's MCP server, list its tools, make one harmless call.
+  update --check      Compare each installed app with its latest GitHub release.
+  update [APP…]       Download each newer Windows installer, verify its SHA-256, install it,
+                      then run check on the updated apps.
 
   --config FILE       Use another app list (default: craft-apps.json next to this script).
 `;
@@ -29,6 +33,14 @@ async function main(argv) {
       return 0;
     case 'check':
       return (await check(loadConfig(configFile))) === 0 ? 0 : 1;
+    case 'update': {
+      const config = loadConfig(configFile);
+      const only = rest.filter((a, i) => !a.startsWith('--') && rest[i - 1] !== '--config');
+      if (rest.includes('--check')) return (await update(config, { only })) === 0 ? 0 : 1;
+      const failed = await update(config, { install: true, only });
+      const checked = await check({ ...config, apps: config.apps.filter((a) => only.length === 0 || only.includes(a.name)) });
+      return failed + checked === 0 ? 0 : 1;
+    }
     case undefined:
     case 'help':
     case '--help':

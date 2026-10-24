@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/craft.test.mjs"
+    "test": "node --test test/craft.test.mjs test/update.test.mjs"
   },
   "license": "MIT OR Apache-2.0"
 }
