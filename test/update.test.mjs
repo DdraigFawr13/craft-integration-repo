@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { compareVersions, parseSums, parseVersion, releaseRepo, update } from '../lib/update.mjs';
@@ -96,7 +96,21 @@ test('a cancelled install is reported as cancelled', async () => {
   const { fetchFn } = fakeGitHub();
   const lines = [];
   await update(config, { install: true, fetchFn, downloads: mkdtempSync(join(tmpdir(), 'craft-dl-')), installMsi: () => 1602, log: (l) => lines.push(l) });
-  assert.match(lines[1], /msiexec exited with 1602 \(cancelled\)$/);
+  assert.match(lines[1], /msiexec exited with 1602 \(cancelled\)\. The verified installer is kept at /);
+});
+
+test('a verified download kept from a failed install is reused; a partial one is fetched again', async () => {
+  const downloads = mkdtempSync(join(tmpdir(), 'craft-dl-'));
+  writeFileSync(join(downloads, msiName), msiBytes);
+  const reused = fakeGitHub();
+  await update(config, { install: true, fetchFn: reused.fetchFn, downloads, installMsi: () => 1619, log: () => {} });
+  assert.equal(reused.calls.includes('https://dl/msi'), false);
+  writeFileSync(join(downloads, msiName), msiBytes.slice(0, 4));
+  const refetched = fakeGitHub();
+  const lines = [];
+  await update(config, { install: true, fetchFn: refetched.fetchFn, downloads, installMsi: () => 1619, log: (l) => lines.push(l) });
+  assert.equal(refetched.calls.includes('https://dl/msi'), true);
+  assert.match(lines[1], /1619 \(Windows Installer could not open the package; .*run update from your own terminal\)/);
 });
 
 test('naming an app that is not in the list is refused', async () => {
