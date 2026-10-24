@@ -2,10 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { candidatePaths, expandHome, findExe, loadConfig, resolveArgs } from '../lib/config.mjs';
-import { check, findClaude, mergeAllowRules, setup, shellCommand } from '../lib/commands.mjs';
+import { check, findClaude, mergeAllowRules, saveSettings, setup, shellCommand } from '../lib/commands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fakeServer = join(here, 'fixtures', 'fake-server.mjs');
@@ -74,6 +74,18 @@ test('allow rules are added once and existing settings are kept', () => {
   assert.deepEqual(merged.permissions.allow, ['Bash(ls)', 'mcp__wordcraft__get_text', 'mcp__wordcraft__parity']);
   assert.deepEqual(merged.permissions.deny, ['Read(.env)']);
   assert.deepEqual(settings.permissions.allow, ['Bash(ls)', 'mcp__wordcraft__get_text'], 'input is not changed');
+});
+
+test('a settings save that fails leaves the old file and explains what happened', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'craft-settings-'));
+  const file = join(dir, 'settings.json');
+  writeFileSync(file, '{"model":"x"}\n');
+  mkdirSync(`${file}.tmp`); // a folder in the temp file's place makes the write fail on every platform
+  assert.throws(() => saveSettings(file, { model: 'y' }), /could not save the allow rules.*is unchanged/s);
+  assert.equal(readFileSync(file, 'utf8'), '{"model":"x"}\n');
+  saveSettings(join(dir, 'fresh.json'), { model: 'y' });
+  assert.deepEqual(JSON.parse(readFileSync(join(dir, 'fresh.json'), 'utf8')), { model: 'y' });
+  assert.equal(existsSync(join(dir, 'fresh.json.tmp')), false);
 });
 
 test('setup --dry-run prints the commands and writes nothing', () => {
