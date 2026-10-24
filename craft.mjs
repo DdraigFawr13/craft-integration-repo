@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { loadConfig } from './lib/config.mjs';
 import { check, doctor, setup } from './lib/commands.mjs';
+import { open } from './lib/open.mjs';
 import { update } from './lib/update.mjs';
 
 const USAGE = `Usage: node craft.mjs <command> [options]
@@ -15,6 +16,8 @@ const USAGE = `Usage: node craft.mjs <command> [options]
   update --check      Compare each installed app with its latest GitHub release.
   update [APP…]       Download each newer Windows installer, verify its SHA-256, install it,
                       then run check on the updated apps.
+  open APP [FILE]     Start APP's window on its own control port (optionally with FILE), check
+                      that Claude can attach, and register it as "APP-live" for new sessions.
 
   --config FILE       Use another app list (default: craft-apps.json next to this script).
 `;
@@ -33,6 +36,12 @@ async function main(argv) {
       return 0;
     case 'check':
       return (await check(loadConfig(configFile))) === 0 ? 0 : 1;
+    case 'open': {
+      const [name, file] = rest.filter((a, i) => !a.startsWith('--') && rest[i - 1] !== '--config');
+      if (!name) throw new Error('open needs an app name, e.g. node craft.mjs open wordcraft');
+      await open(loadConfig(configFile), name, file);
+      return 0;
+    }
     case 'update': {
       const config = loadConfig(configFile);
       const only = rest.filter((a, i) => !a.startsWith('--') && rest[i - 1] !== '--config');

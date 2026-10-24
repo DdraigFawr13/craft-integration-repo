@@ -64,6 +64,7 @@ Releases come from `github.com/<releaseOwner>/<app>` (`storytold` in `craft-apps
 | `args` | How to start the server. `{workFolder}` is replaced by the work folder |
 | `probe` | The harmless call `check` makes |
 | `readOnlyTools` | Tools allowed without asking. `check` fails if a name here is not offered by the server, or if the server annotates it and does not mark it read-only |
+| `live` | Optional: how `open` starts the app's window and attaches to it (see below) |
 
 What each app is started with, and why (W is the work folder):
 
@@ -75,7 +76,37 @@ What each app is started with, and why (W is the work folder):
 | LightCraft | `mcp --compact` | Leaves out ~90 one-tool-per-command entries; `run_command` still reaches them. No `--library`, so it never locks your real library |
 | GridCraft, CADCraft, FilmCraft | `mcp` | Headless session. These have no root flags yet |
 
-All run headless (no window). Driving the open app window comes in a later phase (`craft open`).
+All run headless (no window). To watch Claude work, use `open` (below).
+
+## Watch Claude work in a window
+
+```sh
+node craft.mjs open wordcraft                       # start WordCraft's window
+node craft.mjs open photocraft ~/CraftWork/a.jpg    # start it with a file
+```
+
+`open` starts the app's window on its own control port (`live.port`: 18001 PhotoCraft to 18011 EffectCraft,
+so two open apps never share 7979). It waits for the port, attaches the way Claude will and makes the probe
+call, then registers `<app>-live` with Claude Code. Start a new Claude Code session to use the live tools;
+they work while that window is open. If something already answers on the port, `open` uses it.
+
+The live entry is added only by `open`, not by `setup`. Seven apps' attach mode exits when no window is
+open, and Claude Code starts every registered server when a session begins. To drop one:
+`claude mcp remove --scope user wordcraft-live`.
+
+| `live` field | Meaning |
+| --- | --- |
+| `port` | The control port for this app's window |
+| `guiArgs` | How the window is started. `{port}`, `{tokenFile}` and `{workFolder}` are filled in |
+| `attach` | How the MCP server attaches to the window |
+| `gui` | Optional: the window program, when it is not `<app>.exe` beside the CLI |
+
+- **PdfCraft** has no `live` entry: its `mcp` server cannot attach to a window.
+- **PhotoCraft's** control port needs a token. The window and the server share
+  `%LOCALAPPDATA%\craft\photocraft.token`, which the window creates on first use.
+- **PhotoCraft and VectorCraft** windows get the work-folder roots, because those windows enforce them. Every
+  other window can reach any file your account can, so in live mode their open, save and export tools
+  always ask first.
 
 ## Safety
 
