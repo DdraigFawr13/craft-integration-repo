@@ -28,7 +28,8 @@ Then restart Claude Code and run `/mcp` to see the servers.
 3. Adds `mcp__<app>__<tool>` rules to `permissions.allow` in `~/.claude/settings.json` for the tools listed
    under `readOnlyTools`, so Claude can look without asking. Every other tool (open, save, export, run a
    command) still asks you first. The previous file is kept as `settings.json.craft-backup`.
-   `--no-allow` skips this step.
+   `--no-allow` skips this step. Run `setup` from your own terminal: a Claude Code session may not replace its
+   own `settings.json`. If the save fails, the servers stay registered, the old file is kept, and `setup` says so.
 
 ## The app list
 
