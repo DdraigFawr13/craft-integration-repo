@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { candidatePaths, expandHome, findExe, loadConfig, resolveArgs } from '../lib/config.mjs';
-import { check, mergeAllowRules, setup, shellCommand } from '../lib/commands.mjs';
+import { check, findClaude, mergeAllowRules, setup, shellCommand } from '../lib/commands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fakeServer = join(here, 'fixtures', 'fake-server.mjs');
@@ -54,6 +54,13 @@ test('shell commands quote paths with spaces and refuse cmd.exe metacharacters',
   assert.equal(shellCommand(['/opt/My App/x', "it's"], 'linux'), "'/opt/My App/x' 'it'\\''s'");
 });
 
+test('claude.exe is found in ~/.local/bin when it is not on PATH', () => {
+  const env = { Path: 'C:\\Windows\\system32' };
+  const found = findClaude(env, 'win32', (p) => p === 'C:\\Users\\m\\.local\\bin\\claude.exe', 'C:\\Users\\m');
+  assert.equal(found, 'C:\\Users\\m\\.local\\bin\\claude.exe');
+  assert.equal(findClaude(env, 'win32', () => false, 'C:\\Users\\m'), null);
+});
+
 test('allow rules are added once and existing settings are kept', () => {
   const settings = { model: 'x', permissions: { allow: ['Bash(ls)', 'mcp__wordcraft__get_text'], deny: ['Read(.env)'] } };
   const { merged, added } = mergeAllowRules(settings, ['mcp__wordcraft__get_text', 'mcp__wordcraft__parity']);
@@ -68,7 +75,7 @@ test('setup --dry-run prints the commands and writes nothing', () => {
   const lines = [];
   const rules = setup(fakeConfig(), { dryRun: true, home, log: (l) => lines.push(l) });
   assert.deepEqual(rules, ['mcp__fake__list_commands']);
-  assert.match(lines[0], /^WOULD RUN {2}claude mcp add --scope user fake -- /);
+  assert.match(lines[0], /^WOULD RUN {2}\S*claude\S* mcp add --scope user fake -- /);
   assert.throws(() => readFileSync(join(home, '.claude', 'settings.json')));
 });
 

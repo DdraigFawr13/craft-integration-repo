@@ -8,7 +8,7 @@ First apps: PhotoCraft, LightCraft and WordCraft. More are added by appending to
 
 ## Use it
 
-Needs Node 20 or newer, Claude Code's `claude` command on PATH, and the apps installed from their release
+Needs Node 20 or newer, Claude Code (found on PATH or in `~/.local/bin`, where its installer puts it), and the apps installed from their release
 installers, which put `<app>-cli.exe` in `C:\Program Files\<App>\`.
 
 ```sh
