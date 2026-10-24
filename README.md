@@ -22,12 +22,13 @@ node craft.mjs check             # start each server, list its tools, make one h
 
 Then restart Claude Code and run `/mcp` to see the servers.
 
-`setup` does three things, and nothing else:
+`setup` does four things, and nothing else:
 
 1. Creates the work folder (`~/CraftWork` by default) if it is missing.
 2. Runs `claude mcp add --scope user <app> -- <path to app-cli> <args>` for each installed app, replacing an
    earlier entry of the same name.
-3. Adds `mcp__<app>__<tool>` rules to `permissions.allow` in `~/.claude/settings.json` for the tools listed
+3. Installs the `craft-apps` skill at `~/.claude/skills/craft-apps/SKILL.md` (see below), replacing an earlier copy.
+4. Adds `mcp__<app>__<tool>` rules to `permissions.allow` in `~/.claude/settings.json` for the tools listed
    under `readOnlyTools`, so Claude can look without asking. Every other tool (open, save, export, run a
    command) still asks you first. The previous file is kept as `settings.json.craft-backup`.
    `--no-allow` skips this step. Windows refuses to replace the file while another program has it open, so
@@ -60,6 +61,8 @@ Releases come from `github.com/<releaseOwner>/<app>` (`storytold` in `craft-apps
 | Field | Meaning |
 | --- | --- |
 | `name` | The server name in Claude Code, and the middle part of its tool names |
+| `use` | One line on what the app is for. The skill picks the app from these |
+| `guide` | The app's agent guide, as a path in its repo (`github.com/<releaseOwner>/<app>`) |
 | `exe`, `installDir` | The CLI program and the installer's folder under Program Files |
 | `path` | Optional: the full path to the CLI, when it is somewhere else |
 | `args` | How to start the server. `{workFolder}` is replaced by the work folder |
@@ -108,6 +111,24 @@ open, and Claude Code starts every registered server when a session begins. To d
 - **PhotoCraft and VectorCraft** windows get the work-folder roots, because those windows enforce them. Every
   other window can reach any file your account can, so in live mode their open, save and export tools
   always ask first.
+
+## The craft-apps skill
+
+`skills/craft-apps/SKILL.md` tells Claude how to work in the apps:
+
+- pick the app from the `use` lines
+- read that app's own agent guide before its first call
+- look command ids up instead of guessing them
+- keep files in the work folder and never save over an original
+- render the result and look at it before reporting
+- ask before overwriting, deleting, running scripts or leaving the work folder
+
+It holds no facts about any app. Those stay in `craft-apps.json` and in each app's guide, so they can't go stale
+in a second copy. `setup` fills in this checkout's path, the work folder and the release owner when it installs
+the skill.
+
+No craft app ships a skill of its own; I searched all twelve repos. Each app does ship an agent guide, and the
+skill points to it. The layout follows the `artcraft-mcp` skill, without its copied tool lists.
 
 ## Safety
 
