@@ -9,7 +9,8 @@
       "exe": "photocraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "session_list", "arguments": {} },
-      "readOnlyTools": ["session_list", "doc_inspect", "doc_render_preview", "render_preview", "command_list", "ui_inspect", "ui_screenshot"]
+      "readOnlyTools": ["session_list", "doc_inspect", "doc_render_preview", "render_preview", "command_list", "ui_inspect", "ui_screenshot"],
+      "live": { "port": 18001, "guiArgs": ["--control", "{port}", "--control-token-file", "{tokenFile}", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"], "attach": ["mcp", "--bridge", "127.0.0.1:{port}", "--control-token-file", "{tokenFile}"] }
     },
     {
       "name": "lightcraft",
@@ -18,7 +19,8 @@
       "exe": "lightcraft-cli",
       "args": ["mcp", "--compact"],
       "probe": { "tool": "list_controls", "arguments": {} },
-      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "list_commands", "query_photos", "list_controls", "get_develop"]
+      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "list_commands", "query_photos", "list_controls", "get_develop"],
+      "live": { "port": 18002, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--compact", "--connect=127.0.0.1:{port}"] }
     },
     {
       "name": "wordcraft",
@@ -27,7 +29,8 @@
       "exe": "wordcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "get_text", "arguments": {} },
-      "readOnlyTools": ["list_commands", "get_text", "inspect_document", "render_page", "parity", "screenshot", "ui_inspect"]
+      "readOnlyTools": ["list_commands", "get_text", "inspect_document", "render_page", "parity", "screenshot", "ui_inspect"],
+      "live": { "port": 18003, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "pdfcraft",
@@ -45,7 +48,8 @@
       "exe": "designcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "list_commands", "arguments": {} },
-      "readOnlyTools": ["list_commands", "inspect_document", "get_story", "menu_list", "ui_inspect"]
+      "readOnlyTools": ["list_commands", "inspect_document", "get_story", "menu_list", "ui_inspect"],
+      "live": { "port": 18004, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "gridcraft",
@@ -54,7 +58,8 @@
       "exe": "gridcraft-cli",
       "args": ["mcp"],
       "probe": { "tool": "list_functions", "arguments": {} },
-      "readOnlyTools": ["list_commands", "inspect_workbook", "read_range", "get_cell", "evaluate_formula", "list_functions"]
+      "readOnlyTools": ["list_commands", "inspect_workbook", "read_range", "get_cell", "evaluate_formula", "list_functions"],
+      "live": { "port": 18005, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "deckcraft",
@@ -63,7 +68,8 @@
       "exe": "deckcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "list_commands", "arguments": {} },
-      "readOnlyTools": ["list_commands", "inspect_document", "inspect_slide", "render_slide", "screenshot"]
+      "readOnlyTools": ["list_commands", "inspect_document", "inspect_slide", "render_slide", "screenshot"],
+      "live": { "port": 18006, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "cadcraft",
@@ -72,7 +78,8 @@
       "exe": "cadcraft-cli",
       "args": ["mcp"],
       "probe": { "tool": "list_commands", "arguments": {} },
-      "readOnlyTools": ["list_commands", "inspect_drawing", "query_entities", "find_text"]
+      "readOnlyTools": ["list_commands", "inspect_drawing", "query_entities", "find_text"],
+      "live": { "port": 18007, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "vectorcraft",
@@ -81,7 +88,8 @@
       "exe": "vectorcraft-cli",
       "args": ["mcp", "--headless", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "command_list", "arguments": {} },
-      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "ui_inspect", "ui_screenshot", "list_commands", "inspect_document", "inspect_ui"]
+      "readOnlyTools": ["command_list", "doc_inspect", "render_preview", "ui_inspect", "ui_screenshot", "list_commands", "inspect_document", "inspect_ui"],
+      "live": { "port": 18008, "guiArgs": ["--control", "{port}", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "soundcraft",
@@ -90,7 +98,8 @@
       "exe": "soundcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "list_commands", "arguments": {} },
-      "readOnlyTools": ["list_commands", "inspect_session", "parity", "ui_inspect"]
+      "readOnlyTools": ["list_commands", "inspect_session", "parity", "ui_inspect"],
+      "live": { "port": 18009, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}"] }
     },
     {
       "name": "filmcraft",
@@ -99,7 +108,8 @@
       "exe": "filmcraft-cli",
       "args": ["mcp"],
       "probe": { "tool": "command_list", "arguments": {} },
-      "readOnlyTools": ["command_list", "doc_inspect", "project_inspect", "render_frame", "render_preview", "sequence_inspect", "ui_elements", "ui_inspect", "ui_screenshot"]
+      "readOnlyTools": ["command_list", "doc_inspect", "project_inspect", "render_frame", "render_preview", "sequence_inspect", "ui_elements", "ui_inspect", "ui_screenshot"],
+      "live": { "port": 18010, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--bridge", "127.0.0.1:{port}"] }
     },
     {
       "name": "effectcraft",
@@ -108,7 +118,8 @@
       "exe": "effectcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "list_commands", "arguments": {} },
-      "readOnlyTools": ["list_commands", "describe_command", "get_project", "get_comp", "get_layer", "get_property", "list_effects", "list_fonts", "get_state", "command_list", "render_preview", "doc_inspect"]
+      "readOnlyTools": ["list_commands", "describe_command", "get_project", "get_comp", "get_layer", "get_property", "list_effects", "list_fonts", "get_state", "command_list", "render_preview", "doc_inspect"],
+      "live": { "port": 18011, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--bridge", "127.0.0.1:{port}"] }
     }
   ]
 }
