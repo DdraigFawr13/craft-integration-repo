@@ -17,9 +17,12 @@ function fakeConfig(extra = {}) {
   };
 }
 
-test('the shipped app list loads and names three apps', () => {
+test('the shipped app list loads all twelve apps, each once, each with a probe', () => {
   const config = loadConfig(join(here, '..', 'craft-apps.json'));
-  assert.deepEqual(config.apps.map((a) => a.name), ['photocraft', 'lightcraft', 'wordcraft']);
+  const names = config.apps.map((a) => a.name);
+  assert.equal(names.length, 12);
+  assert.equal(new Set(names).size, 12);
+  for (const app of config.apps) assert.ok(app.probe?.tool, `${app.name} has a probe`);
 });
 
 test('a config with a bad app name is refused', () => {
@@ -100,7 +103,13 @@ test('setup --dry-run prints the commands and writes nothing', () => {
 test('check passes against a server that answers, following tool-list pages', async () => {
   const lines = [];
   assert.equal(await check(fakeConfig(), { log: (l) => lines.push(l) }), 0);
-  assert.match(lines[0], /^PASS {5}Fake: fake 1.0, 2 tools$/);
+  assert.match(lines[0], /^PASS {5}Fake: fake 1.0, 3 tools$/);
+});
+
+test('check fails when readOnlyTools names a tool the server marks as writing', async () => {
+  const lines = [];
+  assert.equal(await check(fakeConfig({ readOnlyTools: ['list_commands', 'save'] }), { log: (l) => lines.push(l) }), 1);
+  assert.match(lines[0], /does not mark read-only: save$/);
 });
 
 test('check says to run setup when an app needs a work folder that is missing', async () => {

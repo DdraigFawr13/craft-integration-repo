@@ -4,7 +4,9 @@ Lets Claude Code on your desktop use the installed craft apps as tools. Each app
 MCP server inside its `-cli` program (`wordcraft-cli mcp` and so on). This repo does not replace those
 servers; it finds them, registers them with Claude Code, and checks that they answer.
 
-First apps: PhotoCraft, LightCraft and WordCraft. More are added by appending to `craft-apps.json`.
+All twelve local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
+DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft and EffectCraft. More are added by appending to
+`craft-apps.json`.
 
 ## Use it
 
@@ -43,23 +45,28 @@ Then restart Claude Code and run `/mcp` to see the servers.
 | `path` | Optional: the full path to the CLI, when it is somewhere else |
 | `args` | How to start the server. `{workFolder}` is replaced by the work folder |
 | `probe` | The harmless call `check` makes |
-| `readOnlyTools` | Tools allowed without asking. `check` fails if a name here is not offered by the server |
+| `readOnlyTools` | Tools allowed without asking. `check` fails if a name here is not offered by the server, or if the server annotates it and does not mark it read-only |
 
-What each app is started with, and why:
+What each app is started with, and why (W is the work folder):
 
 | App | Args | Why |
 | --- | --- | --- |
-| PhotoCraft | `mcp --automation-read-root W --automation-write-root W` | PhotoCraft refuses all file access without roots. Paths are relative to the work folder |
+| PhotoCraft, WordCraft, DesignCraft, DeckCraft, SoundCraft, EffectCraft | `mcp --automation-read-root W --automation-write-root W` | Every file the app's tools read or write must be inside the work folder |
+| PdfCraft | `mcp --compact` + the two roots | `--compact` lists a core set plus `tool_search` and `tool_call` instead of ~120 task tools |
+| VectorCraft | `mcp --headless` + the two roots | Without `--headless` it attaches to whatever app answers on port 7979 |
 | LightCraft | `mcp --compact` | Leaves out ~90 one-tool-per-command entries; `run_command` still reaches them. No `--library`, so it never locks your real library |
-| WordCraft | `mcp` | Headless document session |
+| GridCraft, CADCraft, FilmCraft | `mcp` | Headless session. These have no root flags yet |
 
-All three run headless (no window). Driving the open app window comes in a later phase (`craft open`).
+All run headless (no window). Driving the open app window comes in a later phase (`craft open`).
 
 ## Safety
 
-- PhotoCraft can only read and write inside the work folder. LightCraft and WordCraft can reach any file
-  your account can, so their save, export and import tools always ask before running.
-- LightCraft's `render_photo` is not on the allow list because it can write to a path.
+- Eight apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft and FilmCraft
+  can reach any file your account can, so their open, save, export and import tools always ask first.
+- The allow lists come from each server's own `readOnlyHint` annotations, minus tools that take a file path
+  to write to: GridCraft's `screenshot`, CADCraft's `render`, SoundCraft's `screenshot` and LightCraft's
+  `render_photo` always ask. CADCraft and SoundCraft do not annotate their tools, so their lists were picked
+  by reading the tool descriptions.
 
 ## Develop
 

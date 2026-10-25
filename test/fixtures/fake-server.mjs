@@ -6,7 +6,7 @@ if (mode === 'crash') {
   process.stderr.write('fake server could not start\n');
   process.exit(3);
 }
-const tools = [{ name: 'list_commands' }, { name: 'get_text' }];
+const tools = [{ name: 'list_commands' }, { name: 'get_text' }, { name: 'save', annotations: { readOnlyHint: false, destructiveHint: true } }];
 const reply = (id, result) => process.stdout.write(`${JSON.stringify({ jsonrpc: '2.0', id, result })}\n`);
 
 createInterface({ input: process.stdin }).on('line', (line) => {
