@@ -5,7 +5,7 @@ import { dirname, join } from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { candidatePaths, expandHome, findExe, loadConfig, resolveArgs } from '../lib/config.mjs';
-import { check, findClaude, mergeAllowRules, saveSettings, setup, shellCommand } from '../lib/commands.mjs';
+import { check, findClaude, installSkill, mergeAllowRules, saveSettings, setup, shellCommand } from '../lib/commands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fakeServer = join(here, 'fixtures', 'fake-server.mjs');
@@ -97,7 +97,29 @@ test('setup --dry-run prints the commands and writes nothing', () => {
   const rules = setup(fakeConfig(), { dryRun: true, home, log: (l) => lines.push(l) });
   assert.deepEqual(rules, ['mcp__fake__list_commands']);
   assert.match(lines[0], /^WOULD RUN {2}\S*claude\S* mcp add --scope user fake -- /);
+  assert.match(lines[1], /^WOULD INSTALL the craft-apps skill at /);
   assert.throws(() => readFileSync(join(home, '.claude', 'settings.json')));
+  assert.equal(existsSync(join(home, '.claude', 'skills')), false);
+});
+
+test('the craft-apps skill is installed with this checkout, the work folder and the release owner filled in', () => {
+  const home = mkdtempSync(join(tmpdir(), 'craft-home-'));
+  const lines = [];
+  installSkill({ workFolder: '~/CraftWork', releaseOwner: 'storytold' }, { home, log: (l) => lines.push(l) });
+  const skill = readFileSync(join(home, '.claude', 'skills', 'craft-apps', 'SKILL.md'), 'utf8');
+  assert.match(skill, /^---\nname: craft-apps\ndescription: /);
+  assert.ok(skill.includes(`${join(here, '..')}/craft-apps.json`), 'points at this checkout');
+  assert.ok(skill.includes(join(home, 'CraftWork')), 'names the work folder');
+  assert.ok(skill.includes('https://github.com/storytold/<app>/blob/main/<guide>'));
+  assert.doesNotMatch(skill, /\{(repo|workFolder|releaseOwner)\}/);
+  assert.match(lines[0], /^SKILL {4}craft-apps installed at /);
+});
+
+test('every app in the shipped list says what it is for and where its agent guide is', () => {
+  for (const app of loadConfig(join(here, '..', 'craft-apps.json')).apps) {
+    assert.ok(app.use, `${app.name} has a use line`);
+    assert.match(app.guide ?? '', /\.md$/, `${app.name} has a guide`);
+  }
 });
 
 test('check passes against a server that answers, following tool-list pages', async () => {

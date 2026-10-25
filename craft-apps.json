@@ -5,6 +5,8 @@
     {
       "name": "photocraft",
       "label": "PhotoCraft",
+      "use": "Raster photo editing, painting and compositing in layers (Photoshop-style)",
+      "guide": "book/src/automation/mcp.md",
       "installDir": "PhotoCraft",
       "exe": "photocraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -15,6 +17,8 @@
     {
       "name": "lightcraft",
       "label": "LightCraft",
+      "use": "Photo library and non-destructive raw development (Lightroom-style)",
+      "guide": "docs/mcp.md",
       "installDir": "LightCraft",
       "exe": "lightcraft-cli",
       "args": ["mcp", "--compact"],
@@ -25,6 +29,8 @@
     {
       "name": "wordcraft",
       "label": "WordCraft",
+      "use": "Word-processor documents: docx, odt, rtf, pdf export (Word-style)",
+      "guide": "docs/mcp.md",
       "installDir": "WordCraft",
       "exe": "wordcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -35,6 +41,8 @@
     {
       "name": "pdfcraft",
       "label": "PdfCraft",
+      "use": "Reading, editing, combining, redacting and OCR of PDFs",
+      "guide": "docs/mcp.md",
       "installDir": "PdfCraft",
       "exe": "pdfcraft-cli",
       "args": ["mcp", "--compact", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -44,6 +52,8 @@
     {
       "name": "designcraft",
       "label": "DesignCraft",
+      "use": "Page layout and print design (InDesign-style)",
+      "guide": "docs/agents.md",
       "installDir": "DesignCraft",
       "exe": "designcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -54,6 +64,8 @@
     {
       "name": "gridcraft",
       "label": "GridCraft",
+      "use": "Spreadsheets, formulas and charts (Excel-style)",
+      "guide": "docs/mcp.md",
       "installDir": "GridCraft",
       "exe": "gridcraft-cli",
       "args": ["mcp"],
@@ -64,6 +76,8 @@
     {
       "name": "deckcraft",
       "label": "DeckCraft",
+      "use": "Presentations and slide shows (PowerPoint-style)",
+      "guide": "docs/mcp.md",
       "installDir": "DeckCraft",
       "exe": "deckcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -74,6 +88,8 @@
     {
       "name": "cadcraft",
       "label": "CADCraft",
+      "use": "2D computer-aided design and drafting, DXF and DWG (AutoCAD-style)",
+      "guide": "docs/mcp.md",
       "installDir": "CADCraft",
       "exe": "cadcraft-cli",
       "args": ["mcp"],
@@ -84,6 +100,8 @@
     {
       "name": "vectorcraft",
       "label": "VectorCraft",
+      "use": "Vector art and illustration (Illustrator-style)",
+      "guide": "docs/mcp.md",
       "installDir": "VectorCraft",
       "exe": "vectorcraft-cli",
       "args": ["mcp", "--headless", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -94,6 +112,8 @@
     {
       "name": "soundcraft",
       "label": "SoundCraft",
+      "use": "Multitrack audio recording, editing and mixing (Pro Tools-style)",
+      "guide": "docs/mcp.md",
       "installDir": "SoundCraft",
       "exe": "soundcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
@@ -104,6 +124,8 @@
     {
       "name": "filmcraft",
       "label": "FilmCraft",
+      "use": "Nonlinear video editing (Premiere-style)",
+      "guide": "docs/agents.md",
       "installDir": "FilmCraft",
       "exe": "filmcraft-cli",
       "args": ["mcp"],
@@ -114,6 +136,8 @@
     {
       "name": "effectcraft",
       "label": "EffectCraft",
+      "use": "Motion graphics and compositing (After Effects-style)",
+      "guide": "docs/agents.md",
       "installDir": "EffectCraft",
       "exe": "effectcraft-cli",
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
