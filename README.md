@@ -34,6 +34,25 @@ Then restart Claude Code and run `/mcp` to see the servers.
    the save is retried for about a second. If it still fails, the servers stay registered, the old file is
    kept, and `setup` says so: run it again.
 
+## Keep the apps updated
+
+```sh
+node craft.mjs update --check        # installed version vs latest release, with installer name and size
+node craft.mjs update                # install every newer release, then run check on the apps
+node craft.mjs update wordcraft      # just one (or several) apps
+```
+
+Releases come from `github.com/<releaseOwner>/<app>` (`storytold` in `craft-apps.json`; an app can set its own
+`repo`). For each app that is behind, `update`:
+
+1. Refuses if the app is running, since the installer would have to close it.
+2. Downloads `<app>-<version>-windows-x64.msi` to `%LOCALAPPDATA%\craft\downloads`.
+3. Checks its SHA-256 against the release's `SHA256SUMS.txt`, and deletes it if they differ.
+4. Runs `msiexec /i <file> /passive /norestart`. The installers are per-machine, so Windows asks you to
+   allow each one. Nothing is installed without that click.
+5. Checks the app now reports the new version, deletes the installer, and finally runs `check`, so a release
+   that renamed or re-annotated a tool on the allow list shows up as a FAIL.
+
 ## The app list
 
 `craft-apps.json` holds one entry per app:

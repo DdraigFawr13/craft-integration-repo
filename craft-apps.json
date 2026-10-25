@@ -1,5 +1,6 @@
 {
   "workFolder": "~/CraftWork",
+  "releaseOwner": "storytold",
   "apps": [
     {
       "name": "photocraft",
