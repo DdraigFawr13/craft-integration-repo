@@ -144,6 +144,17 @@
       "probe": { "tool": "list_commands", "arguments": {} },
       "readOnlyTools": ["list_commands", "describe_command", "get_project", "get_comp", "get_layer", "get_property", "list_effects", "list_fonts", "get_state", "command_list", "render_preview", "doc_inspect"],
       "live": { "port": 18011, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--bridge", "127.0.0.1:{port}"] }
+    },
+    {
+      "name": "figcraft",
+      "label": "FigCraft",
+      "use": "Interface design and prototyping: frames, components, auto layout (Figma-style)",
+      "guide": "docs/mcp.md",
+      "installDir": "FigCraft",
+      "exe": "figcraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": {} },
+      "readOnlyTools": ["list_commands", "inspect_document", "get_node", "screenshot", "inspect_ui"]
     }
   ]
 }

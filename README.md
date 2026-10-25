@@ -4,14 +4,15 @@ Lets Claude Code on your desktop use the installed craft apps as tools. Each app
 MCP server inside its `-cli` program (`wordcraft-cli mcp` and so on). This repo does not replace those
 servers; it finds them, registers them with Claude Code, and checks that they answer.
 
-All twelve local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
-DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft and EffectCraft. More are added by appending to
+All thirteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
+DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft and FigCraft. More are added by appending to
 `craft-apps.json`.
 
 ## Use it
 
-Needs Node 20 or newer, Claude Code (found on PATH or in `~/.local/bin`, where its installer puts it), and the apps installed from their release
-installers, which put `<app>-cli.exe` in `C:\Program Files\<App>\`.
+Needs Node 20 or newer, Claude Code (found on PATH or in `~/.local/bin`, where its installer puts it), and the
+apps, installed with the [ArtCraft Launcher](https://github.com/storytold/craft-launcher). Its portable installs
+(`%LOCALAPPDATA%\ArtCraft Launcher\apps\<app>\`) are found first, then its MSI installs (`C:\Program Files\<App>\`).
 
 ```sh
 node craft.mjs doctor            # which apps are installed, where, which version
@@ -37,22 +38,16 @@ Then restart Claude Code and run `/mcp` to see the servers.
 
 ## Keep the apps updated
 
-```sh
-node craft.mjs update --check        # installed version vs latest release, with installer name and size
-node craft.mjs update                # install every newer release, then run check on the apps
-node craft.mjs update wordcraft      # just one (or several) apps
-```
+The ArtCraft Launcher does this; this repo does not install anything. In the launcher's settings, turn on
+**Automatically download and install updates** (off by default). Updates keep the format each app was installed
+with:
 
-Releases come from `github.com/<releaseOwner>/<app>` (`storytold` in `craft-apps.json`; an app can set its own
-`repo`). For each app that is behind, `update`:
+- **Portable (.zip)**: installs for your account, so updates need no admin prompt and run unattended.
+- **Installer (.msi)**: installs for all users, so Windows asks for admin on every update.
 
-1. Refuses if the app is running, since the installer would have to close it.
-2. Downloads `<app>-<version>-windows-x64.msi` to `%LOCALAPPDATA%\craft\downloads`.
-3. Checks its SHA-256 against the release's `SHA256SUMS.txt`, and deletes it if they differ.
-4. Runs `msiexec /i <file> /passive /norestart`. The installers are per-machine, so Windows asks you to
-   allow each one. Nothing is installed without that click.
-5. Checks the app now reports the new version, deletes the installer, and finally runs `check`, so a release
-   that renamed or re-annotated a tool on the allow list shows up as a FAIL.
+To move an app from MSI to portable, uninstall it in the launcher, then install it again as Portable. After the
+launcher updates or moves an app, run `node craft.mjs check`. It shows a FAIL if a release renamed or
+re-annotated a tool on the allow list. If the app's folder changed (MSI to portable), run `setup` as well.
 
 ## The app list
 
@@ -74,7 +69,7 @@ What each app is started with, and why (W is the work folder):
 
 | App | Args | Why |
 | --- | --- | --- |
-| PhotoCraft, WordCraft, DesignCraft, DeckCraft, SoundCraft, EffectCraft | `mcp --automation-read-root W --automation-write-root W` | Every file the app's tools read or write must be inside the work folder |
+| PhotoCraft, WordCraft, DesignCraft, DeckCraft, SoundCraft, EffectCraft, FigCraft | `mcp --automation-read-root W --automation-write-root W` | Every file the app's tools read or write must be inside the work folder |
 | PdfCraft | `mcp --compact` + the two roots | `--compact` lists a core set plus `tool_search` and `tool_call` instead of ~120 task tools |
 | VectorCraft | `mcp --headless` + the two roots | Without `--headless` it attaches to whatever app answers on port 7979 |
 | LightCraft | `mcp --compact` | Leaves out ~90 one-tool-per-command entries; `run_command` still reaches them. No `--library`, so it never locks your real library |
@@ -127,17 +122,17 @@ It holds no facts about any app. Those stay in `craft-apps.json` and in each app
 in a second copy. `setup` fills in this checkout's path, the work folder and the release owner when it installs
 the skill.
 
-No craft app ships a skill of its own; I searched all twelve repos. Each app does ship an agent guide, and the
+No craft app ships a skill of its own; I searched the twelve repos then known. Each app does ship an agent guide, and the
 skill points to it. The layout follows the `artcraft-mcp` skill, without its copied tool lists.
 
 ## Safety
 
-- Eight apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft and FilmCraft
+- Nine apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft and FilmCraft
   can reach any file your account can, so their open, save, export and import tools always ask first.
 - The allow lists come from each server's own `readOnlyHint` annotations, minus tools that take a file path
-  to write to: GridCraft's `screenshot`, CADCraft's `render`, SoundCraft's `screenshot` and LightCraft's
-  `render_photo` always ask. CADCraft and SoundCraft do not annotate their tools, so their lists were picked
-  by reading the tool descriptions.
+  to write to: GridCraft's `screenshot`, CADCraft's `render`, SoundCraft's `screenshot`, FigCraft's `export` and
+  LightCraft's `render_photo` always ask. CADCraft and SoundCraft do not annotate their tools, so their lists
+  were picked by reading the tool descriptions.
 
 ## Develop
 

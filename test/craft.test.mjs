@@ -17,11 +17,11 @@ function fakeConfig(extra = {}) {
   };
 }
 
-test('the shipped app list loads all twelve apps, each once, each with a probe', () => {
+test('the shipped app list loads all thirteen apps, each once, each with a probe', () => {
   const config = loadConfig(join(here, '..', 'craft-apps.json'));
   const names = config.apps.map((a) => a.name);
-  assert.equal(names.length, 12);
-  assert.equal(new Set(names).size, 12);
+  assert.equal(names.length, 13);
+  assert.equal(new Set(names).size, 13);
   for (const app of config.apps) assert.ok(app.probe?.tool, `${app.name} has a probe`);
 });
 
@@ -37,16 +37,15 @@ test('a config saved with a UTF-8 byte order mark loads', () => {
   assert.equal(loadConfig(file).apps[0].name, 'fake');
 });
 
-test('installer folders are searched before PATH on Windows', () => {
+test('the launcher\'s portable install is searched first, then its MSI install in Program Files, then PATH', () => {
   const env = { ProgramFiles: 'C:\\Program Files', LOCALAPPDATA: 'C:\\Users\\m\\AppData\\Local', PATH: 'C:\\bin' };
-  const paths = candidatePaths({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32');
-  assert.deepEqual(paths, [
+  const app = { name: 'wordcraft', exe: 'wordcraft-cli', installDir: 'WordCraft' };
+  assert.deepEqual(candidatePaths(app, env, 'win32'), [
+    'C:\\Users\\m\\AppData\\Local\\ArtCraft Launcher\\apps\\wordcraft\\wordcraft-cli.exe',
     'C:\\Program Files\\WordCraft\\wordcraft-cli.exe',
-    'C:\\Users\\m\\AppData\\Local\\Programs\\WordCraft\\wordcraft-cli.exe',
     'C:\\bin\\wordcraft-cli.exe',
   ]);
-  const found = findExe({ exe: 'wordcraft-cli', installDir: 'WordCraft' }, env, 'win32', (p) => p.startsWith('C:\\Users'));
-  assert.equal(found, 'C:\\Users\\m\\AppData\\Local\\Programs\\WordCraft\\wordcraft-cli.exe');
+  assert.equal(findExe(app, env, 'win32', (p) => p.startsWith('C:\\Program')), 'C:\\Program Files\\WordCraft\\wordcraft-cli.exe');
 });
 
 test('the work folder fills in {workFolder} and ~ expands to home', () => {
