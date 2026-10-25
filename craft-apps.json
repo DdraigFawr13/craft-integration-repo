@@ -1,0 +1,32 @@
+{
+  "workFolder": "~/CraftWork",
+  "apps": [
+    {
+      "name": "photocraft",
+      "label": "PhotoCraft",
+      "installDir": "PhotoCraft",
+      "exe": "photocraft-cli",
+      "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
+      "probe": { "tool": "session_list", "arguments": {} },
+      "readOnlyTools": ["session_list", "doc_inspect", "doc_render_preview", "command_list", "jobs_list"]
+    },
+    {
+      "name": "lightcraft",
+      "label": "LightCraft",
+      "installDir": "LightCraft",
+      "exe": "lightcraft-cli",
+      "args": ["mcp", "--compact"],
+      "probe": { "tool": "list_controls", "arguments": {} },
+      "readOnlyTools": ["list_commands", "query_photos", "list_controls", "get_develop"]
+    },
+    {
+      "name": "wordcraft",
+      "label": "WordCraft",
+      "installDir": "WordCraft",
+      "exe": "wordcraft-cli",
+      "args": ["mcp"],
+      "probe": { "tool": "get_text", "arguments": {} },
+      "readOnlyTools": ["list_commands", "get_text", "inspect_document", "render_page", "parity"]
+    }
+  ]
+}
