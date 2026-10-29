@@ -17,11 +17,11 @@ function fakeConfig(extra = {}) {
   };
 }
 
-test('the shipped app list loads all thirteen apps, each once, each with a probe', () => {
+test('the shipped app list loads all fourteen apps, each once, each with a probe', () => {
   const config = loadConfig(join(here, '..', 'craft-apps.json'));
   const names = config.apps.map((a) => a.name);
-  assert.equal(names.length, 13);
-  assert.equal(new Set(names).size, 13);
+  assert.equal(names.length, 14);
+  assert.equal(new Set(names).size, 14);
   for (const app of config.apps) assert.ok(app.probe?.tool, `${app.name} has a probe`);
 });
 

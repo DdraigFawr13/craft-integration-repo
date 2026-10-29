@@ -4,8 +4,8 @@ Lets Claude Code on your desktop use the installed craft apps as tools. Each app
 MCP server inside its `-cli` program (`wordcraft-cli mcp` and so on). This repo does not replace those
 servers; it finds them, registers them with Claude Code, and checks that they answer.
 
-All thirteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
-DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft and FigCraft. More are added by appending to
+All fourteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
+DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft and SolidCraft. More are added by appending to
 `craft-apps.json`.
 
 ## Use it
@@ -57,7 +57,7 @@ re-annotated a tool on the allow list. If the app's folder changed (MSI to porta
 | --- | --- |
 | `name` | The server name in Claude Code, and the middle part of its tool names |
 | `use` | One line on what the app is for. The skill picks the app from these |
-| `guide` | The app's agent guide, as a path in its repo (`github.com/<releaseOwner>/<app>`) |
+| `guide` | The app's agent guide, as a path in its repo (`github.com/<releaseOwner>/<app>`), or a full URL for an app hosted elsewhere (SolidCraft is `tangency-labs/solidcraft`) |
 | `exe`, `installDir` | The CLI program and the installer's folder under Program Files |
 | `path` | Optional: the full path to the CLI, when it is somewhere else |
 | `args` | How to start the server. `{workFolder}` is replaced by the work folder |
@@ -73,6 +73,7 @@ What each app is started with, and why (W is the work folder):
 | PdfCraft | `mcp --compact` + the two roots | `--compact` lists a core set plus `tool_search` and `tool_call` instead of ~120 task tools |
 | VectorCraft | `mcp --headless` + the two roots | Without `--headless` it attaches to whatever app answers on port 7979 |
 | LightCraft | `mcp --compact` | Leaves out ~90 one-tool-per-command entries; `run_command` still reaches them. No `--library`, so it never locks your real library |
+| SolidCraft | `mcp --headless --allow-path W` | Without `--headless` it attaches to a running SolidCraft window. `--allow-path` adds the work folder to the folders its tools may reach |
 | GridCraft, CADCraft, FilmCraft | `mcp` | Headless session. These have no root flags yet |
 
 All run headless (no window). To watch Claude work, use `open` (below).
@@ -85,7 +86,7 @@ node craft.mjs open photocraft ~/CraftWork/a.jpg    # start it with a file
 ```
 
 `open` starts the app's window on its own control port (`live.port`: 18001 PhotoCraft to 18011 EffectCraft,
-so two open apps never share 7979). It waits for the port, attaches the way Claude will and makes the probe
+18012 SolidCraft, so two open apps never share a port). It waits for the port, attaches the way Claude will and makes the probe
 call, then registers `<app>-live` with Claude Code. Start a new Claude Code session to use the live tools;
 they work while that window is open. If something already answers on the port, `open` uses it.
 
@@ -122,13 +123,16 @@ It holds no facts about any app. Those stay in `craft-apps.json` and in each app
 in a second copy. `setup` fills in this checkout's path, the work folder and the release owner when it installs
 the skill.
 
-No craft app ships a skill of its own; I searched the twelve repos then known. Each app does ship an agent guide, and the
-skill points to it. The layout follows the `artcraft-mcp` skill, without its copied tool lists.
+No storytold craft app ships a skill of its own; I searched the twelve repos then known. Each app does ship an agent guide, and the
+skill points to it. SolidCraft bundles four skill documents of its own (modeling, mechanisms, editing, checking), read
+through its `skill_reference` tool; its guide says when. The layout follows the `artcraft-mcp` skill, without its copied tool lists.
 
 ## Safety
 
 - Nine apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft and FilmCraft
   can reach any file your account can, so their open, save, export and import tools always ask first.
+- SolidCraft reaches the work folder, plus the folder of a design it opened or saved when that folder is inside
+  your home folder and not hidden. Its open, save, export, screenshot, execute and batch tools always ask first.
 - The allow lists come from each server's own `readOnlyHint` annotations, minus tools that take a file path
   to write to: GridCraft's `screenshot`, CADCraft's `render`, SoundCraft's `screenshot`, FigCraft's `export` and
   LightCraft's `render_photo` always ask. CADCraft and SoundCraft do not annotate their tools, so their lists

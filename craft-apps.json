@@ -155,6 +155,18 @@
       "args": ["mcp", "--automation-read-root", "{workFolder}", "--automation-write-root", "{workFolder}"],
       "probe": { "tool": "list_commands", "arguments": {} },
       "readOnlyTools": ["list_commands", "inspect_document", "get_node", "screenshot", "inspect_ui"]
+    },
+    {
+      "name": "solidcraft",
+      "label": "SolidCraft",
+      "use": "Parametric 3D CAD: sketches, solids, assemblies, sheet metal; STEP, STL, 3MF (SolidWorks/Fusion-style)",
+      "guide": "https://github.com/tangency-labs/solidcraft/blob/main/docs/mcp.md",
+      "installDir": "SolidCraft",
+      "exe": "solidcraft-cli",
+      "args": ["mcp", "--headless", "--allow-path", "{workFolder}"],
+      "probe": { "tool": "list_commands", "arguments": { "filter": "sketch.create" } },
+      "readOnlyTools": ["list_commands", "describe_command", "inspect_design", "measure", "body_topology", "skill_reference", "running"],
+      "live": { "port": 18012, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}", "--allow-path", "{workFolder}"] }
     }
   ]
 }

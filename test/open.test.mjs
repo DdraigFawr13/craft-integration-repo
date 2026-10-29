@@ -48,8 +48,8 @@ test('the window program is found beside the CLI', () => {
 test('every live port in the shipped list is unique, and PdfCraft has none', () => {
   const config = loadConfig(join(here, '..', 'craft-apps.json'));
   const ports = config.apps.filter((a) => a.live).map((a) => a.live.port);
-  assert.equal(ports.length, 11);
-  assert.equal(new Set(ports).size, 11);
+  assert.equal(ports.length, 12);
+  assert.equal(new Set(ports).size, 12);
   assert.equal(config.apps.find((a) => a.name === 'pdfcraft').live, undefined);
 });
 
