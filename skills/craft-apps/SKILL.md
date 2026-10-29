@@ -1,6 +1,6 @@
 ---
 name: craft-apps
-description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video, motion graphics or interface designs, through the mcp__<app>__ or mcp__<app>-live__ tools.
+description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video, motion graphics, interface designs or 3D CAD parts, through the mcp__<app>__ or mcp__<app>-live__ tools.
 ---
 
 # Working in the craft apps
@@ -14,7 +14,7 @@ This skill holds no facts about any app. They live in two places; read them, don
 
 - `{repo}/craft-apps.json`: each app's `use` (what it is for), `guide` (its agent guide), the tools allowed without
   asking (`readOnlyTools`), and how it is started (`args`, `live`).
-- The app's guide: `https://github.com/{releaseOwner}/<app>/blob/main/<guide>`.
+- The app's guide: `https://github.com/{releaseOwner}/<app>/blob/main/<guide>`, or `guide` itself when it is a full URL.
 
 ## Steps
 
