@@ -2,10 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { candidatePaths, expandHome, findExe, loadConfig, resolveArgs } from '../lib/config.mjs';
-import { check, findClaude, installSkill, mergeAllowRules, saveSettings, setup, shellCommand } from '../lib/commands.mjs';
+import { candidatePaths, expandHome, findExe, loadConfig, resolveArgs, serverCommand } from '../lib/config.mjs';
+import { check, findClaude, installRunner, installSkill, mergeAllowRules, saveSettings, setup, shellCommand } from '../lib/commands.mjs';
+import { McpClient } from '../lib/mcp-client.mjs';
+import { prepareCopy, removeOldCopies } from '../lib/server-copy.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fakeServer = join(here, 'fixtures', 'fake-server.mjs');
@@ -154,6 +156,91 @@ test('check fails when the probe call returns a tool error', async () => {
     assert.match(lines[0], /get_text returned an error: no document/);
   } finally {
     delete process.env.FAKE_MODE;
+  }
+});
+
+// A stand-in for a launcher install: the CLI, its window program, portable mode's files and a model the CLI needs.
+function fakeInstall() {
+  const dir = mkdtempSync(join(tmpdir(), 'craft-app-'));
+  const exe = join(dir, 'fake-cli.exe');
+  writeFileSync(exe, 'version one');
+  writeFileSync(join(dir, 'fake.exe'), 'window');
+  writeFileSync(join(dir, 'portable.txt'), 'portable');
+  mkdirSync(join(dir, 'FakeData'));
+  writeFileSync(join(dir, 'FakeData', 'ui.json'), '{}');
+  mkdirSync(join(dir, 'models'));
+  writeFileSync(join(dir, 'models', 'm.onnx'), 'model');
+  return { dir, exe, root: mkdtempSync(join(tmpdir(), 'craft-state-')) };
+}
+
+test('a launcher install starts through the runner; a path of your own or on PATH starts as it is', () => {
+  const env = { ProgramFiles: 'C:\\Program Files', LOCALAPPDATA: 'C:\\L', PATH: 'C:\\bin' };
+  const app = { name: 'wordcraft', exe: 'wordcraft-cli', installDir: 'WordCraft' };
+  for (const exe of ['C:\\L\\ArtCraft Launcher\\apps\\wordcraft\\wordcraft-cli.exe', 'C:\\Program Files\\WordCraft\\wordcraft-cli.exe']) {
+    assert.deepEqual(serverCommand(app, exe, ['mcp'], 'C:\\r.mjs', env, 'win32'), { command: process.execPath, args: ['C:\\r.mjs', exe, 'mcp'] });
+  }
+  assert.deepEqual(serverCommand(app, 'C:\\bin\\wordcraft-cli.exe', ['mcp'], 'C:\\r.mjs', env, 'win32'), { command: 'C:\\bin\\wordcraft-cli.exe', args: ['mcp'] });
+  assert.deepEqual(serverCommand(app, '/usr/bin/wordcraft-cli', ['mcp'], '/r.mjs', env, 'linux'), { command: '/usr/bin/wordcraft-cli', args: ['mcp'] });
+});
+
+test('the copy holds what the server needs, not the window program or portable mode\'s files', () => {
+  const { dir, exe, root } = fakeInstall();
+  const copied = prepareCopy(exe, root);
+  assert.notEqual(dirname(copied), dir);
+  assert.deepEqual(readdirSync(dirname(copied)).sort(), ['fake-cli.exe', 'models']);
+  assert.equal(readFileSync(join(dirname(copied), 'models', 'm.onnx'), 'utf8'), 'model');
+});
+
+test('an unchanged CLI reuses its copy; an updated one gets a new copy and the old one goes', () => {
+  const { exe, root } = fakeInstall();
+  const first = prepareCopy(exe, root);
+  const marker = join(dirname(first), 'marker');
+  writeFileSync(marker, 'kept');
+  assert.equal(prepareCopy(exe, root), first);
+  assert.ok(existsSync(marker), 'the copy was not made again');
+  writeFileSync(exe, 'version two, longer');
+  const second = prepareCopy(exe, root);
+  assert.notEqual(second, first);
+  assert.equal(readFileSync(second, 'utf8'), 'version two, longer');
+  assert.equal(existsSync(first), false);
+  assert.deepEqual(readdirSync(dirname(dirname(second))).length, 1);
+});
+
+test('an old copy whose CLI cannot be deleted stays whole; a fresh partial copy from another session is left alone', () => {
+  const versions = mkdtempSync(join(tmpdir(), 'craft-versions-'));
+  // A folder in the CLI's place fails the delete the way a running program does on Windows.
+  mkdirSync(join(versions, 'old', 'fake-cli.exe', 'x'), { recursive: true });
+  writeFileSync(join(versions, 'old', 'needed'), 'x');
+  mkdirSync(join(versions, 'new.tmp-1'));
+  mkdirSync(join(versions, 'stale.tmp-2'));
+  mkdirSync(join(versions, 'new'));
+  removeOldCopies(versions, 'new', 'fake-cli.exe');
+  assert.ok(existsSync(join(versions, 'old', 'needed')));
+  assert.ok(existsSync(join(versions, 'new.tmp-1')));
+  utimesSync(join(versions, 'stale.tmp-2'), new Date(0), new Date(0));
+  removeOldCopies(versions, 'new', 'fake-cli.exe');
+  assert.equal(existsSync(join(versions, 'stale.tmp-2')), false);
+  assert.ok(existsSync(join(versions, 'new')));
+});
+
+test('a server started through the runner answers, and its original can be replaced while it runs', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'craft-app-'));
+  const exe = join(dir, 'fake-cli.exe');
+  copyFileSync(process.execPath, exe);
+  const local = mkdtempSync(join(tmpdir(), 'craft-local-'));
+  installRunner(local);
+  const saved = process.env.LOCALAPPDATA;
+  process.env.LOCALAPPDATA = local;
+  const client = new McpClient(process.execPath, [join(local, 'run-server.mjs'), exe, fakeServer], { timeoutMs: 60000 });
+  try {
+    assert.equal((await client.initialize()).serverInfo.name, 'fake');
+    rmSync(exe); // Windows refuses this for a running program, so it passes only if the copy is what runs
+    assert.equal(existsSync(exe), false);
+    assert.equal((await client.request('tools/list')).tools.length > 0, true);
+  } finally {
+    await client.close();
+    if (saved === undefined) delete process.env.LOCALAPPDATA;
+    else process.env.LOCALAPPDATA = saved;
   }
 });
 

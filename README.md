@@ -26,8 +26,10 @@ Then restart Claude Code and run `/mcp` to see the servers.
 `setup` does four things, and nothing else:
 
 1. Creates the work folder (`~/CraftWork` by default) if it is missing.
-2. Runs `claude mcp add --scope user <app> -- <path to app-cli> <args>` for each installed app, replacing an
-   earlier entry of the same name.
+2. Registers each installed app with `claude mcp add --scope user`, replacing an earlier entry of the same name,
+   and repoints any `<app>-live` entry that `open` added. A launcher install is registered as
+   `node <run-server.mjs> <path to app-cli> <args>` (see [Keep the apps updated](#keep-the-apps-updated)), and
+   any other install as `<path to app-cli> <args>`.
 3. Installs the `craft-apps` skill at `~/.claude/skills/craft-apps/SKILL.md` (see below), replacing an earlier copy.
 4. Adds `mcp__<app>__<tool>` rules to `permissions.allow` in `~/.claude/settings.json` for the tools listed
    under `readOnlyTools`, so Claude can look without asking. Every other tool (open, save, export, run a
@@ -48,6 +50,24 @@ with:
 To move an app from MSI to portable, uninstall it in the launcher, then install it again as Portable. After the
 launcher updates or moves an app, run `node craft.mjs check`. It shows a FAIL if a release renamed or
 re-annotated a tool on the allow list. If the app's folder changed (MSI to portable), run `setup` as well.
+
+Claude Code keeps every registered server running for as long as a session is open, and Windows refuses to replace
+a running program. A server started from the launcher's folder would make its updates fail with
+`Access is denied (os error 5)`, so servers run from a copy:
+
+- `setup` installs `run-server.mjs` and `server-copy.mjs` in `%LOCALAPPDATA%\craft`, outside this checkout, so
+  switching branches here cannot break a registered server. Run `setup` again to pick up changes to them.
+- When a server starts, `run-server.mjs` compares the launcher's CLI with its copy in
+  `%LOCALAPPDATA%\craft\servers\<app>-cli\<size>-<time>\` and copies the app's folder if the CLI changed. If the copy
+  fails, the server runs from the launcher's folder and says so on stderr.
+- Copies leave out the window program, `portable.txt` and the `*Data` folder, so a copied server keeps its settings
+  in the app's per-user folder. They take about 1.1 GB for all fourteen apps. A copy that no open session is running
+  is removed the next time that app's server starts.
+- Each server keeps a Node process running beside it, about 37 MB each, or roughly 550 MB per open session.
+  That is the running cost of this.
+
+An open session keeps the version it started with; a new session gets the update. An open app **window** still
+runs from the launcher's folder, so that one app's update fails until you close its window.
 
 ## The app list
 
