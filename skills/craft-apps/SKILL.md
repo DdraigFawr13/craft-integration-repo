@@ -1,6 +1,6 @@
 ---
 name: craft-apps
-description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video, motion graphics, interface designs or 3D CAD parts, through the mcp__<app>__ or mcp__<app>-live__ tools.
+description: Use when the user wants something made, edited, inspected or converted with the craft apps (PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft, DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft, TextureCraft, Craft Anything): pictures, photos, documents, PDFs, page layouts, spreadsheets, slides, drawings, vector art, audio, video, motion graphics, interface designs, 3D CAD parts, textures for 3D models, or studying how a website, app or game works, through the mcp__<app>__ or mcp__<app>-live__ tools.
 ---
 
 # Working in the craft apps
@@ -38,6 +38,9 @@ This skill holds no facts about any app. They live in two places; read them, don
 - Saving over a file that already exists, or deleting anything.
 - Running scripts (PDF JavaScript, app scripting) or raw control-channel calls.
 - Anything outside the work folder.
+- Studying a website, program or game the user did not name, or one they may not own or be allowed to examine.
+- Turning on Deep mode, or a tool that spends money (Craft Anything). It runs with `--allow-run`, so its own check
+  will not stop a tool that runs code: say what will run before calling one.
 
 The read-only tools in `readOnlyTools` already run without asking. Every other tool shows a permission prompt.
 
