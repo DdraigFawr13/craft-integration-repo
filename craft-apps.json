@@ -167,6 +167,29 @@
       "probe": { "tool": "list_commands", "arguments": { "filter": "sketch.create" } },
       "readOnlyTools": ["list_commands", "describe_command", "inspect_design", "measure", "body_topology", "skill_reference", "running"],
       "live": { "port": 18012, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--connect", "127.0.0.1:{port}", "--allow-path", "{workFolder}"] }
+    },
+    {
+      "name": "texturecraft",
+      "label": "TextureCraft",
+      "use": "3D texture painting: PBR layers and masks on a model, mesh map baking, smart materials, texture export for game engines (Substance Painter-style)",
+      "guide": "docs/control-protocol.md",
+      "installDir": "TextureCraft",
+      "exe": "texturecraft-cli",
+      "args": ["mcp", "--read-root", "{workFolder}", "--write-root", "{workFolder}"],
+      "probe": { "tool": "command_list", "arguments": { "filter": "bake" } },
+      "readOnlyTools": ["command_list", "session_inspect", "viewport_render", "viewport_screenshot", "ui_inspect", "ui_screenshot"],
+      "live": { "port": 18013, "guiArgs": ["--control", "{port}"], "attach": ["mcp", "--bridge", "{port}"] }
+    },
+    {
+      "name": "craft-anything",
+      "label": "Craft Anything",
+      "use": "Study how a website, app, game or file works and collect evidence, on things the user owns or may examine (reverse engineering, clean-room by default)",
+      "guide": "docs/tools.md",
+      "installDir": "Craft Anything",
+      "exe": "craft-anything-cli",
+      "args": ["mcp", "--allow-run"],
+      "probe": { "tool": "list_toolsets", "arguments": {} },
+      "readOnlyTools": ["core_session_show", "core_targets_list", "core_evidence_show", "core_unknowns_show", "core_unknown_verify", "core_investigation_show", "core_journal_read", "list_toolsets"]
     }
   ]
 }

@@ -4,8 +4,8 @@ Lets Claude Code on your desktop use the installed craft apps as tools. Each app
 MCP server inside its `-cli` program (`wordcraft-cli mcp` and so on). This repo does not replace those
 servers; it finds them, registers them with Claude Code, and checks that they answer.
 
-All fourteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
-DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft and SolidCraft. More are added by appending to
+All sixteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
+DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft, TextureCraft and Craft Anything. More are added by appending to
 `craft-apps.json`.
 
 ## Use it
@@ -61,9 +61,9 @@ a running program. A server started from the launcher's folder would make its up
   `%LOCALAPPDATA%\craft\servers\<app>-cli\<size>-<time>\` and copies the app's folder if the CLI changed. If the copy
   fails, the server runs from the launcher's folder and says so on stderr.
 - Copies leave out the window program, `portable.txt` and the `*Data` folder, so a copied server keeps its settings
-  in the app's per-user folder. They take about 1.1 GB for all fourteen apps. A copy that no open session is running
+  in the app's per-user folder. They take about 1.2 GB for all sixteen apps. A copy that no open session is running
   is removed the next time that app's server starts.
-- Each server keeps a Node process running beside it, about 37 MB each, or roughly 550 MB per open session.
+- Each server keeps a Node process running beside it, about 37 MB each, or roughly 600 MB per open session.
   That is the running cost of this.
 
 An open session keeps the version it started with; a new session gets the update. An open app **window** still
@@ -94,7 +94,9 @@ What each app is started with, and why (W is the work folder):
 | VectorCraft | `mcp --headless` + the two roots | Without `--headless` it attaches to whatever app answers on port 7979 |
 | LightCraft | `mcp --compact` | Leaves out ~90 one-tool-per-command entries; `run_command` still reaches them. No `--library`, so it never locks your real library |
 | SolidCraft | `mcp --headless --allow-path W` | Without `--headless` it attaches to a running SolidCraft window. `--allow-path` adds the work folder to the folders its tools may reach |
+| TextureCraft | `mcp --read-root W --write-root W` | The same confinement as the first row, under its own flag names |
 | GridCraft, CADCraft, FilmCraft | `mcp` | Headless session. These have no root flags yet |
+| Craft Anything | `mcp --allow-run` | No root flags. Its server cannot ask for approval in a Claude session, so without `--allow-run` it refuses every tool that opens a website or runs code. No `--deep`, so it stays in Clean room. Do not run its own `setup`: that registers a server in the launcher's folder, which blocks updates |
 
 All run headless (no window). To watch Claude work, use `open` (below).
 
@@ -106,7 +108,7 @@ node craft.mjs open photocraft ~/CraftWork/a.jpg    # start it with a file
 ```
 
 `open` starts the app's window on its own control port (`live.port`: 18001 PhotoCraft to 18011 EffectCraft,
-18012 SolidCraft, so two open apps never share a port). It waits for the port, attaches the way Claude will and makes the probe
+18012 SolidCraft, 18013 TextureCraft, so two open apps never share a port). It waits for the port, attaches the way Claude will and makes the probe
 call, then registers `<app>-live` with Claude Code. Start a new Claude Code session to use the live tools;
 they work while that window is open. If something already answers on the port, `open` uses it.
 
@@ -121,7 +123,9 @@ open, and Claude Code starts every registered server when a session begins. To d
 | `attach` | How the MCP server attaches to the window |
 | `gui` | Optional: the window program, when it is not `<app>.exe` beside the CLI |
 
-- **PdfCraft** has no `live` entry: its `mcp` server cannot attach to a window.
+- **PdfCraft and Craft Anything** have no `live` entry: their `mcp` servers cannot attach to a window.
+- **TextureCraft's** control port needs a token. The window writes it to `%TEMP%\texturecraft-control-18013.token`
+  and the server reads it from there.
 - **PhotoCraft's** control port needs a token. The window and the server share
   `%LOCALAPPDATA%\craft\photocraft.token`, which the window creates on first use.
 - **PhotoCraft and VectorCraft** windows get the work-folder roots, because those windows enforce them. Every
@@ -149,14 +153,24 @@ through its `skill_reference` tool; its guide says when. The layout follows the 
 
 ## Safety
 
-- Nine apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft and FilmCraft
-  can reach any file your account can, so their open, save, export and import tools always ask first.
+- Ten apps can only read and write inside the work folder. LightCraft, GridCraft, CADCraft, FilmCraft and Craft
+  Anything can reach any file your account can, so their open, save, export and import tools always ask first.
+- Craft Anything inspects other software, and its website tools go out over the network. Use it on what you own
+  or may examine. It stays in Clean room, so it refuses to read inside a file or a page's source. For one run on a
+  target you choose, use `craft-anything-cli --deep <tool>`.
+- With `--allow-run`, Claude Code's permission prompt is the only approval for Craft Anything's tools that run code
+  or change a device. Only its read-only tools are allowed without asking, but in a session using auto or bypass
+  permissions those tools run with no prompt at all. Remove the flag from `craft-apps.json` and re-run `setup` to
+  have them refused instead.
+- Craft Anything's server runs from a copy without `portable.txt`, so it would keep any settings it saves in
+  `%APPDATA%\craft-anything`, apart from the window's.
 - SolidCraft reaches the work folder, plus the folder of a design it opened or saved when that folder is inside
   your home folder and not hidden. Its open, save, export, screenshot, execute and batch tools always ask first.
 - The allow lists come from each server's own `readOnlyHint` annotations, minus tools that take a file path
   to write to: GridCraft's `screenshot`, CADCraft's `render`, SoundCraft's `screenshot`, FigCraft's `export` and
   LightCraft's `render_photo` always ask. CADCraft and SoundCraft do not annotate their tools, so their lists
-  were picked by reading the tool descriptions.
+  were picked by reading the tool descriptions. TextureCraft does not annotate its tools either, so its list was
+  picked from its control protocol document.
 
 ## Develop
 
