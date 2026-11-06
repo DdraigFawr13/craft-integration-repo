@@ -190,6 +190,17 @@
       "args": ["mcp", "--allow-run"],
       "probe": { "tool": "list_toolsets", "arguments": {} },
       "readOnlyTools": ["core_session_show", "core_targets_list", "core_evidence_show", "core_unknowns_show", "core_unknown_verify", "core_investigation_show", "core_journal_read", "list_toolsets"]
+    },
+    {
+      "name": "materialcraft",
+      "label": "MaterialCraft",
+      "use": "Node-based procedural material design: PBR material graphs, SBS packages, texture output export and material previews (Substance Designer-style)",
+      "guide": "docs/control-protocol.md",
+      "installDir": "MaterialCraft",
+      "exe": "materialcraft-cli",
+      "args": ["mcp", "--read-root", "{workFolder}", "--write-root", "{workFolder}"],
+      "probe": { "tool": "command_list", "arguments": { "filter": "node" } },
+      "readOnlyTools": ["command_list", "library_list", "session_inspect", "ui_inspect", "ui_screenshot", "view_screenshot"]
     }
   ]
 }

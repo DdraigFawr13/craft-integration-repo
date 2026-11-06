@@ -4,8 +4,8 @@ Lets Claude Code on your desktop use the installed craft apps as tools. Each app
 MCP server inside its `-cli` program (`wordcraft-cli mcp` and so on). This repo does not replace those
 servers; it finds them, registers them with Claude Code, and checks that they answer.
 
-All sixteen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
-DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft, TextureCraft and Craft Anything. More are added by appending to
+All seventeen local craft apps are listed: PhotoCraft, LightCraft, WordCraft, PdfCraft, DesignCraft, GridCraft,
+DeckCraft, CADCraft, VectorCraft, SoundCraft, FilmCraft, EffectCraft, FigCraft, SolidCraft, TextureCraft, Craft Anything and MaterialCraft. More are added by appending to
 `craft-apps.json`.
 
 ## Use it
